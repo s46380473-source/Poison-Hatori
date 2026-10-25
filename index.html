@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Poisons des Hatori</title>
+  <style>
+    :root {
+      --bg: #0c0f14;
+      --card: #151a22;
+      --card2: #1e2633;
+      --accent: #c0392b;
+      --accent2: #e74c3c;
+      --gold: #f1c40f;
+      --text: #e6edf7;
+      --muted: #8a97ad;
+      --border: #2a3444;
+      --success: #27ae60;
+      --input-bg: #0a0d12;
+      --neuro: #5dade2;
+      --hemo: #e74c3c;
+      --necro: #58d68d;
+      --spore: #af7ac5;
+      --mnemo: #f4d03f;
+      --lumi: #85c1e9;
+      --plant: #2ecc71;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.45;
+    }
+
+    .container {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 20px 14px 50px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 26px;
+      padding: 24px 16px;
+      background: linear-gradient(145deg, #1a1520 0%, #151a22 60%, #0f1a18 100%);
+      border-radius: 14px;
+      border: 1px solid var(--border);
+    }
+
+    header h1 {
+      font-size: 1.85rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+    header h1 span { color: var(--accent2); }
+    header p { color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .tab {
+      background: var(--card2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.92rem;
+      transition: all 0.15s;
+    }
+    .tab:hover { border-color: #3d4d66; color: var(--text); }
+    .tab.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+    .tab.active-plant {
+      background: #1a6b3c;
+      border-color: #27ae60;
+      color: #fff;
+    }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .card h2 {
+      font-size: 1.1rem;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    @media (max-width: 720px) {
+      .form-grid { grid-template-columns: 1fr; }
+    }
+
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field.full { grid-column: 1 / -1; }
+
+    label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    input[type="text"], input[type="number"], select, textarea {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 10px 12px;
+      color: var(--text);
+      font-size: 0.92rem;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+    textarea { resize: vertical; min-height: 64px; }
+
+    .types-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 8px;
+    }
+
+    .type-check {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--card2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 12px;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      user-select: none;
+    }
+    .type-check:hover { border-color: #3d4d66; }
+    .type-check input { accent-color: var(--accent); width: 15px; height: 15px; }
+    .type-check.checked-Neuro { border-color: var(--neuro); background: rgba(93,173,226,0.08); }
+    .type-check.checked-Hemo { border-color: var(--hemo); background: rgba(231,76,60,0.08); }
+    .type-check.checked-Necro { border-color: var(--necro); background: rgba(88,214,141,0.08); }
+    .type-check.checked-Spore { border-color: var(--spore); background: rgba(175,122,197,0.08); }
+    .type-check.checked-Mnemo { border-color: var(--mnemo); background: rgba(244,208,63,0.08); }
+    .type-check.checked-Lumi { border-color: var(--lumi); background: rgba(133,193,233,0.08); }
+
+    .type-dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+    .dot-Neuro { background: var(--neuro); }
+    .dot-Hemo { background: var(--hemo); }
+    .dot-Necro { background: var(--necro); }
+    .dot-Spore { background: var(--spore); }
+    .dot-Mnemo { background: var(--mnemo); }
+    .dot-Lumi { background: var(--lumi); }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px 20px;
+    }
+    @media (max-width: 600px) {
+      .stats-grid { grid-template-columns: 1fr; }
+    }
+
+    .stat-row {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .stat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .stat-header span:last-child {
+      font-weight: 700;
+      font-size: 1.05rem;
+      min-width: 28px;
+      text-align: right;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 7px;
+      border-radius: 4px;
+      background: var(--card2);
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: var(--accent2);
+      cursor: pointer;
+      border: 2px solid #fff;
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: var(--accent2);
+      cursor: pointer;
+      border: 2px solid #fff;
+    }
+
+    .stars-select {
+      display: flex;
+      gap: 4px;
+    }
+    .star-btn {
+      background: var(--card2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 1.15rem;
+      width: 36px; height: 36px;
+      border-radius: 7px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .star-btn.active { color: var(--gold); border-color: var(--gold); background: rgba(241,196,15,0.12); }
+    .star-btn:hover { border-color: var(--gold); }
+
+    .btn-row { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; }
+
+    button {
+      cursor: pointer;
+      border: none;
+      border-radius: 7px;
+      padding: 11px 18px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: transform 0.12s, background 0.15s;
+    }
+    button:active { transform: scale(0.97); }
+
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: var(--accent2); }
+    .btn-plant { background: #1a6b3c; color: #fff; }
+    .btn-plant:hover { background: #27ae60; }
+    .btn-secondary { background: var(--card2); color: var(--text); border: 1px solid var(--border); }
+    .btn-secondary:hover { background: #2a3548; }
+    .btn-danger {
+      background: transparent; color: var(--accent2);
+      border: 1px solid var(--accent); padding: 5px 10px; font-size: 0.78rem;
+    }
+    .btn-danger:hover { background: rgba(192,57,43,0.12); }
+
+    .table-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 12px; flex-wrap: wrap; gap: 8px;
+    }
+    .count-badge {
+      background: var(--accent); color: #fff;
+      font-size: 0.72rem; padding: 2px 8px; border-radius: 12px; font-weight: 600;
+    }
+    .count-badge.plant { background: #1a6b3c; }
+
+    .table-wrap { overflow-x: auto; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.86rem; }
+    th {
+      text-align: left; padding: 10px 11px;
+      background: var(--card2); color: var(--muted);
+      font-weight: 600; font-size: 0.7rem;
+      text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap;
+    }
+    td { padding: 11px; border-top: 1px solid var(--border); vertical-align: middle; }
+    tr:hover td { background: rgba(255,255,255,0.015); }
+
+    .poison-name { font-weight: 600; }
+    .flavor { font-size: 0.78rem; color: var(--muted); font-style: italic; margin-top: 2px; }
+
+    .type-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+    .tag {
+      font-size: 0.7rem; font-weight: 600;
+      padding: 2px 7px; border-radius: 10px;
+      border: 1px solid;
+    }
+    .tag-Neuro { color: var(--neuro); border-color: var(--neuro); }
+    .tag-Hemo { color: var(--hemo); border-color: var(--hemo); }
+    .tag-Necro { color: var(--necro); border-color: var(--necro); }
+    .tag-Spore { color: var(--spore); border-color: var(--spore); }
+    .tag-Mnemo { color: var(--mnemo); border-color: var(--mnemo); }
+    .tag-Lumi { color: var(--lumi); border-color: var(--lumi); }
+
+    .stars { color: var(--gold); letter-spacing: 1px; font-size: 0.95rem; }
+
+    .mini-bar {
+      display: flex; align-items: center; gap: 6px;
+    }
+    .bar {
+      height: 6px; border-radius: 3px; background: #252e3d;
+      width: 52px; overflow: hidden;
+    }
+    .bar-fill { height: 100%; border-radius: 3px; }
+    .fill-vir { background: linear-gradient(90deg, #e74c3c, #c0392b); }
+    .fill-lat { background: linear-gradient(90deg, #9b59b6, #8e44ad); }
+    .fill-per { background: linear-gradient(90deg, #3498db, #2980b9); }
+    .fill-vol { background: linear-gradient(90deg, #1abc9c, #16a085); }
+    .fill-ins { background: linear-gradient(90deg, #e67e22, #d35400); }
+
+    .empty-state {
+      text-align: center; padding: 40px 16px; color: var(--muted);
+    }
+
+    details.card { padding: 0; }
+    summary {
+      padding: 14px 18px; cursor: pointer; font-weight: 600; font-size: 1rem;
+      list-style: none; display: flex; align-items: center; gap: 8px; user-select: none;
+    }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: '▼'; margin-left: auto; font-size: 0.65rem; color: var(--muted); }
+    details[open] summary::after { transform: rotate(180deg); }
+
+    .rules-body { padding: 0 18px 18px; border-top: 1px solid var(--border); }
+
+    .rules-table {
+      width: 100%; border-collapse: collapse; font-size: 0.84rem; margin-top: 12px;
+    }
+    .rules-table th, .rules-table td {
+      padding: 9px 10px; text-align: left; border-bottom: 1px solid var(--border);
+    }
+    .rules-table th { color: var(--muted); font-size: 0.72rem; text-transform: uppercase; }
+
+    .stat-explain {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px; margin-top: 14px;
+    }
+    .stat-box {
+      background: var(--card2); border-radius: 8px; padding: 10px 12px;
+    }
+    .stat-box strong { display: block; margin-bottom: 3px; font-size: 0.88rem; }
+    .stat-box span { font-size: 0.8rem; color: var(--muted); }
+
+    footer {
+      text-align: center; margin-top: 30px; color: var(--muted); font-size: 0.78rem;
+    }
+
+    .toast {
+      position: fixed; bottom: 20px; right: 20px;
+      background: var(--success); color: #fff;
+      padding: 11px 18px; border-radius: 8px;
+      font-weight: 600; font-size: 0.88rem;
+      opacity: 0; transform: translateY(16px);
+      transition: all 0.28s; z-index: 50; pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>☠️ <span>Poisons</span> des Hatori</h1>
+      <p>Fioles de poison + Répertoire de plantes</p>
+    </header>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab active" id="tab-poisons" onclick="switchTab('poisons')">🧪 Poisons</button>
+      <button class="tab" id="tab-plantes" onclick="switchTab('plantes')">🌿 Plantes</button>
+    </div>
+
+    <!-- ==================== PANEL POISONS ==================== -->
+    <div class="panel active" id="panel-poisons">
+
+      <div class="card">
+        <h2>➕ Créer un poison</h2>
+
+        <div class="form-grid">
+          <div class="field full">
+            <label>Nom du poison</label>
+            <input type="text" id="nom" placeholder="Ex : Paralysie lente, Souffle de cendre..." maxlength="50" />
+          </div>
+
+          <div class="field full">
+            <label>Citation / Description (optionnel)</label>
+            <input type="text" id="citation" placeholder="Ex : « Rien d’abord… puis plus rien ne bouge. »" maxlength="120" />
+          </div>
+
+          <div class="field full">
+            <label>Types de toxine (plusieurs possibles)</label>
+            <div class="types-grid" id="types-grid">
+              <label class="type-check" data-type="Neuro">
+                <input type="checkbox" value="Neuro" onchange="toggleType(this)" />
+                <span class="type-dot dot-Neuro"></span> Neuro
+              </label>
+              <label class="type-check" data-type="Hemo">
+                <input type="checkbox" value="Hémo" onchange="toggleType(this)" />
+                <span class="type-dot dot-Hemo"></span> Hémo
+              </label>
+              <label class="type-check" data-type="Necro">
+                <input type="checkbox" value="Nécro" onchange="toggleType(this)" />
+                <span class="type-dot dot-Necro"></span> Nécro
+              </label>
+              <label class="type-check" data-type="Spore">
+                <input type="checkbox" value="Spore" onchange="toggleType(this)" />
+                <span class="type-dot dot-Spore"></span> Spore
+              </label>
+              <label class="type-check" data-type="Mnemo">
+                <input type="checkbox" value="Mnémo" onchange="toggleType(this)" />
+                <span class="type-dot dot-Mnemo"></span> Mnémo
+              </label>
+              <label class="type-check" data-type="Lumi">
+                <input type="checkbox" value="Lumi" onchange="toggleType(this)" />
+                <span class="type-dot dot-Lumi"></span> Lumi
+              </label>
+            </div>
+          </div>
+
+          <div class="field full">
+            <label>Qualité</label>
+            <div class="stars-select" id="stars-select">
+              <button type="button" class="star-btn" data-q="1" onclick="setQualite(1)">★</button>
+              <button type="button" class="star-btn" data-q="2" onclick="setQualite(2)">★★</button>
+              <button type="button" class="star-btn" data-q="3" onclick="setQualite(3)">★★★</button>
+              <button type="button" class="star-btn" data-q="4" onclick="setQualite(4)">★★★★</button>
+              <button type="button" class="star-btn" data-q="5" onclick="setQualite(5)">★★★★★</button>
+            </div>
+          </div>
+
+          <div class="field full">
+            <label>Stats (1 à 10)</label>
+            <div class="stats-grid">
+              <div class="stat-row">
+                <div class="stat-header"><span>Virulence</span><span id="val-vir">5</span></div>
+                <input type="range" id="virulence" min="1" max="10" value="5" oninput="updateStat('vir')" />
+              </div>
+              <div class="stat-row">
+                <div class="stat-header"><span>Latence</span><span id="val-lat">5</span></div>
+                <input type="range" id="latence" min="1" max="10" value="5" oninput="updateStat('lat')" />
+              </div>
+              <div class="stat-row">
+                <div class="stat-header"><span>Persistance</span><span id="val-per">5</span></div>
+                <input type="range" id="persistance" min="1" max="10" value="5" oninput="updateStat('per')" />
+              </div>
+              <div class="stat-row">
+                <div class="stat-header"><span>Volatilité</span><span id="val-vol">5</span></div>
+                <input type="range" id="volatilite" min="1" max="10" value="5" oninput="updateStat('vol')" />
+              </div>
+              <div class="stat-row">
+                <div class="stat-header"><span>Instabilité</span><span id="val-ins">5</span></div>
+                <input type="range" id="instabilite" min="1" max="10" value="5" oninput="updateStat('ins')" />
+              </div>
+            </div>
+          </div>
+
+          <div class="field full">
+            <label>Plante / Source (optionnel)</label>
+            <input type="text" id="plante" placeholder="Ex : Belladone, Aconit..." maxlength="40" />
+          </div>
+
+          <div class="field full">
+            <label>Notes</label>
+            <textarea id="notes" placeholder="Préparation, dosage, effets secondaires..."></textarea>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-primary" onclick="ajouterPoison()">Ajouter au registre</button>
+          <button class="btn-secondary" onclick="resetPoisonForm()">Effacer</button>
+        </div>
+      </div>
+
+      <details class="card">
+        <summary>📖 Types de toxines & Stats</summary>
+        <div class="rules-body">
+          <table class="rules-table">
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Effet à chaque touche</th>
+                <th>Force</th>
+                <th>Durée</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="tag tag-Neuro">Neuro</span></td>
+                <td>Lenteur + fatigue</td>
+                <td>Lenteur I → III selon virulence</td>
+                <td>2 à 5 s selon persistance</td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-Hemo">Hémo</span></td>
+                <td>Poison</td>
+                <td>Poison I → III selon virulence</td>
+                <td>2 à 5 s</td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-Necro">Nécro</span></td>
+                <td>Wither + faim</td>
+                <td>fixe</td>
+                <td>2 à 5 s</td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-Spore">Spore</span></td>
+                <td>+1 exposition au gaz</td>
+                <td>—</td>
+                <td>—</td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-Mnemo">Mnémo</span></td>
+                <td>Ténèbres + nausée</td>
+                <td>fixe</td>
+                <td>1,5 à 4 s</td>
+              </tr>
+              <tr>
+                <td><span class="tag tag-Lumi">Lumi</span></td>
+                <td>Surbrillance (visible à travers les murs)</td>
+                <td>—</td>
+                <td>4 à 9 s</td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="stat-explain">
+            <div class="stat-box"><strong>Virulence</strong><span>Puissance de l’effet</span></div>
+            <div class="stat-box"><strong>Latence</strong><span>Délai avant activation</span></div>
+            <div class="stat-box"><strong>Persistance</strong><span>Durée de l’effet</span></div>
+            <div class="stat-box"><strong>Volatilité</strong><span>Dispersion / zone d’effet</span></div>
+            <div class="stat-box"><strong>Instabilité</strong><span>Risque de dégradation / effet imprévu</span></div>
+            <div class="stat-box"><strong>Qualité</strong><span>1 à 5 étoiles — pureté</span></div>
+          </div>
+        </div>
+      </details>
+
+      <div class="card">
+        <div class="table-header">
+          <h2 style="margin:0">📋 Registre des poisons <span class="count-badge" id="count-poisons">0</span></h2>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn-secondary" style="padding:7px 12px;font-size:0.82rem" onclick="exportJSON()">Exporter</button>
+            <button class="btn-secondary" style="padding:7px 12px;font-size:0.82rem" onclick="importJSON()">Importer</button>
+            <button class="btn-danger" onclick="toutEffacerPoisons()">Tout effacer</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Poison</th>
+                <th>Types</th>
+                <th>Qualité</th>
+                <th>Vir</th>
+                <th>Lat</th>
+                <th>Per</th>
+                <th>Vol</th>
+                <th>Ins</th>
+                <th>Source</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="tbody-poisons"></tbody>
+          </table>
+          <div class="empty-state" id="empty-poisons">
+            <div style="font-size:2.2rem">🧪</div>
+            <p style="margin-top:8px">Aucun poison pour l’instant.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== PANEL PLANTES ==================== -->
+    <div class="panel" id="panel-plantes">
+
+      <div class="card">
+        <h2>🌿 Ajouter une plante</h2>
+
+        <div class="form-grid">
+          <div class="field full">
+            <label>Nom de la plante</label>
+            <input type="text" id="plante-nom" placeholder="Ex : Belladone, Aconit, Champignon des brumes..." maxlength="50" />
+          </div>
+
+          <div class="field full">
+            <label>Qualité</label>
+            <div class="stars-select" id="plante-stars">
+              <button type="button" class="star-btn" data-q="1" onclick="setPlanteQualite(1)">★</button>
+              <button type="button" class="star-btn" data-q="2" onclick="setPlanteQualite(2)">★★</button>
+              <button type="button" class="star-btn" data-q="3" onclick="setPlanteQualite(3)">★★★</button>
+              <button type="button" class="star-btn" data-q="4" onclick="setPlanteQualite(4)">★★★★</button>
+              <button type="button" class="star-btn" data-q="5" onclick="setPlanteQualite(5)">★★★★★</button>
+            </div>
+          </div>
+
+          <div class="field full">
+            <label>Stats (1 à 10)</label>
+            <div class="stats-grid">
+              <div class="stat-row">
+                <div class="stat-header"><span>Virulence</span><span id="pval-vir">5</span></div>
+                <input type="range" id="plante-virulence" min="1" max="10" value="5" oninput="updatePlanteStat('vir')" />
+              </div>
+              <div class="stat-row">
+                <div class="stat-header"><span>Instabilité</span><span id="pval-ins">5</span></div>
+                <input type="range" id="plante-instabilite" min="1" max="10" value="5" oninput="updatePlanteStat('ins')" />
+              </div>
+            </div>
+          </div>
+
+          <div class="field full">
+            <label>Notes (optionnel)</label>
+            <textarea id="plante-notes" placeholder="Où la trouver, parties utilisables, dangers..."></textarea>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-plant" onclick="ajouterPlante()">Ajouter la plante</button>
+          <button class="btn-secondary" onclick="resetPlanteForm()">Effacer</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="table-header">
+          <h2 style="margin:0">🌿 Répertoire des plantes <span class="count-badge plant" id="count-plantes">0</span></h2>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn-secondary" style="padding:7px 12px;font-size:0.82rem" onclick="exportPlantes()">Exporter</button>
+            <button class="btn-secondary" style="padding:7px 12px;font-size:0.82rem" onclick="importPlantes()">Importer</button>
+            <button class="btn-danger" onclick="toutEffacerPlantes()">Tout effacer</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Plante</th>
+                <th>Qualité</th>
+                <th>Virulence</th>
+                <th>Instabilité</th>
+                <th>Notes</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="tbody-plantes"></tbody>
+          </table>
+          <div class="empty-state" id="empty-plantes">
+            <div style="font-size:2.2rem">🌿</div>
+            <p style="margin-top:8px">Aucune plante enregistrée pour l’instant.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer>Poisons des Hatori — données stockées localement dans ton navigateur</footer>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    // ========== STATE ==========
+    let qualite = 0;
+    let planteQualite = 0;
+    let poisons = JSON.parse(localStorage.getItem('poisons_hatori_v2') || '[]');
+    let plantes = JSON.parse(localStorage.getItem('plantes_hatori_v1') || '[]');
+
+    // ========== TABS ==========
+    function switchTab(name) {
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab').forEach(t => {
+        t.classList.remove('active', 'active-plant');
+      });
+      document.getElementById('panel-' + name).classList.add('active');
+      const tab = document.getElementById('tab-' + name);
+      if (name === 'plantes') tab.classList.add('active-plant');
+      else tab.classList.add('active');
+    }
+
+    // ========== POISONS ==========
+    function toggleType(el) {
+      const label = el.closest('.type-check');
+      const type = label.dataset.type;
+      if (el.checked) label.classList.add('checked-' + type);
+      else label.classList.remove('checked-' + type);
+    }
+
+    function setQualite(q) {
+      qualite = q;
+      document.querySelectorAll('#stars-select .star-btn').forEach(b => {
+        b.classList.toggle('active', +b.dataset.q <= q);
+      });
+    }
+
+    function updateStat(key) {
+      const map = { vir: 'virulence', lat: 'latence', per: 'persistance', vol: 'volatilite', ins: 'instabilite' };
+      document.getElementById('val-' + key).textContent = document.getElementById(map[key]).value;
+    }
+
+    function getSelectedTypes() {
+      return [...document.querySelectorAll('#types-grid input:checked')].map(i => i.value);
+    }
+
+    function ajouterPoison() {
+      const nom = document.getElementById('nom').value.trim();
+      const citation = document.getElementById('citation').value.trim();
+      const types = getSelectedTypes();
+      const plante = document.getElementById('plante').value.trim();
+      const notes = document.getElementById('notes').value.trim();
+
+      if (!nom) return showToast('Donne un nom au poison', true);
+      if (types.length === 0) return showToast('Choisis au moins un type', true);
+      if (qualite === 0) return showToast('Choisis une qualité', true);
+
+      poisons.push({
+        nom, citation, types, qualite,
+        stars: '★'.repeat(qualite),
+        virulence: +document.getElementById('virulence').value,
+        latence: +document.getElementById('latence').value,
+        persistance: +document.getElementById('persistance').value,
+        volatilite: +document.getElementById('volatilite').value,
+        instabilite: +document.getElementById('instabilite').value,
+        plante, notes
+      });
+      savePoisons();
+      renderPoisons();
+      resetPoisonForm();
+      showToast('Poison ajouté !');
+    }
+
+    function supprimerPoison(i) {
+      if (!confirm('Supprimer ce poison ?')) return;
+      poisons.splice(i, 1);
+      savePoisons();
+      renderPoisons();
+      showToast('Supprimé');
+    }
+
+    function toutEffacerPoisons() {
+      if (!confirm('Tout effacer les poisons ?')) return;
+      poisons = [];
+      savePoisons();
+      renderPoisons();
+      showToast('Registre vidé');
+    }
+
+    function resetPoisonForm() {
+      document.getElementById('nom').value = '';
+      document.getElementById('citation').value = '';
+      document.getElementById('plante').value = '';
+      document.getElementById('notes').value = '';
+      document.querySelectorAll('#types-grid input').forEach(i => {
+        i.checked = false;
+        toggleType(i);
+      });
+      qualite = 0;
+      document.querySelectorAll('#stars-select .star-btn').forEach(b => b.classList.remove('active'));
+      ['virulence','latence','persistance','volatilite','instabilite'].forEach(id => {
+        document.getElementById(id).value = 5;
+      });
+      updateStat('vir'); updateStat('lat'); updateStat('per'); updateStat('vol'); updateStat('ins');
+    }
+
+    function savePoisons() {
+      localStorage.setItem('poisons_hatori_v2', JSON.stringify(poisons));
+    }
+
+    function renderPoisons() {
+      const tbody = document.getElementById('tbody-poisons');
+      const empty = document.getElementById('empty-poisons');
+      document.getElementById('count-poisons').textContent = poisons.length;
+
+      if (poisons.length === 0) {
+        tbody.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+      empty.style.display = 'none';
+
+      tbody.innerHTML = poisons.map((p, i) => {
+        const typeTags = p.types.map(t => {
+          const key = t === 'Hémo' ? 'Hemo' : t === 'Nécro' ? 'Necro' : t === 'Mnémo' ? 'Mnemo' : t;
+          return '<span class="tag tag-' + key + '">' + t + '</span>';
+        }).join('');
+        return '<tr>' +
+          '<td style="color:var(--muted)">' + (i+1) + '</td>' +
+          '<td><div class="poison-name">' + esc(p.nom) + '</div>' +
+          (p.citation ? '<div class="flavor">' + esc(p.citation) + '</div>' : '') + '</td>' +
+          '<td><div class="type-tags">' + typeTags + '</div></td>' +
+          '<td class="stars">' + p.stars + '</td>' +
+          '<td><div class="mini-bar"><div class="bar"><div class="bar-fill fill-vir" style="width:' + (p.virulence*10) + '%"></div></div><strong>' + p.virulence + '</strong></div></td>' +
+          '<td><div class="mini-bar"><div class="bar"><div class="bar-fill fill-lat" style="width:' + (p.latence*10) + '%"></div></div><strong>' + p.latence + '</strong></div></td>' +
+          '<td><div class="mini-bar"><div class="bar"><div class="bar-fill fill-per" style="width:' + (p.persistance*10) + '%"></div></div><strong>' + p.persistance + '</strong></div></td>' +
+          '<td><div class="mini-bar"><div class="bar"><div class="bar-fill fill-vol" style="width:' + (p.volatilite*10) + '%"></div></div><strong>' + p.volatilite + '</strong></div></td>' +
+          '<td><div class="mini-bar"><div class="bar"><div class="bar-fill fill-ins" style="width:' + (p.instabilite*10) + '%"></div></div><strong>' + p.instabilite + '</strong></div></td>' +
+          '<td style="font-size:0.82rem;color:var(--muted)">' + esc(p.plante || '—') + '</td>' +
+          '<td><button class="btn-danger" onclick="supprimerPoison(' + i + ')">✕</button></td>' +
+          '</tr>';
+      }).join('');
+    }
+
+    // ========== PLANTES ==========
+    function setPlanteQualite(q) {
+      planteQualite = q;
+      document.querySelectorAll('#plante-stars .star-btn').forEach(b => {
+        b.classList.toggle('active', +b.dataset.q <= q);
+      });
+    }
+
+    function updatePlanteStat(key) {
+      const map = { vir: 'plante-virulence', ins: 'plante-instabilite' };
+      document.getElementById('pval-' + key).textContent = document.getElementById(map[key]).value;
+    }
+
+    function ajouterPlante() {
+      const nom = document.getElementById('plante-nom').value.trim();
+      const notes = document.getElementById('plante-notes').value.trim();
+
+      if (!nom) return showToast('Donne un nom à la plante', true);
+      if (planteQualite === 0) return showToast('Choisis une qualité', true);
+
+      plantes.push({
+        nom,
+        qualite: planteQualite,
+        stars: '★'.repeat(planteQualite),
+        virulence: +document.getElementById('plante-virulence').value,
+        instabilite: +document.getElementById('plante-instabilite').value,
+        notes
+      });
+      savePlantes();
+      renderPlantes();
+      resetPlanteForm();
+      showToast('Plante ajoutée !');
+    }
+
+    function supprimerPlante(i) {
+      if (!confirm('Supprimer cette plante ?')) return;
+      plantes.splice(i, 1);
+      savePlantes();
+      renderPlantes();
+      showToast('Supprimée');
+    }
+
+    function toutEffacerPlantes() {
+      if (!confirm('Tout effacer les plantes ?')) return;
+      plantes = [];
+      savePlantes();
+      renderPlantes();
+      showToast('Répertoire vidé');
+    }
+
+    function resetPlanteForm() {
+      document.getElementById('plante-nom').value = '';
+      document.getElementById('plante-notes').value = '';
+      planteQualite = 0;
+      document.querySelectorAll('#plante-stars .star-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('plante-virulence').value = 5;
+      document.getElementById('plante-instabilite').value = 5;
+      updatePlanteStat('vir');
+      updatePlanteStat('ins');
+    }
+
+    function savePlantes() {
+      localStorage.setItem('plantes_hatori_v1', JSON.stringify(plantes));
+    }
+
+    function renderPlantes() {
+      const tbody = document.getElementById('tbody-plantes');
+      const empty = document.getElementById('empty-plantes');
+      document.getElementById('count-plantes').textContent = plantes.length;
+
+      if (plantes.length === 0) {
+        tbody.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+      }
+      empty.style.display = 'none';
+
+      tbody.innerHTML = plantes.map((p, i) =>
+        '<tr>' +
+          '<td style="color:var(--muted)">' + (i+1) + '</td>' +
+          '<td class="poison-name">' + esc(p.nom) + '</td>' +
+          '<td class="stars">' + p.stars + '</td>' +
+          '<td><div class="mini-bar"><div class="bar"><div class="bar-fill fill-vir" style="width:' + (p.virulence*10) + '%"></div></div><strong>' + p.virulence + '</strong></div></td>' +
+          '<td><div class="mini-bar"><div class="bar"><div class="bar-fill fill-ins" style="width:' + (p.instabilite*10) + '%"></div></div><strong>' + p.instabilite + '</strong></div></td>' +
+          '<td style="font-size:0.82rem;color:var(--muted);max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + esc(p.notes||'') + '">' + esc(p.notes || '—') + '</td>' +
+          '<td><button class="btn-danger" onclick="supprimerPlante(' + i + ')">✕</button></td>' +
+        '</tr>'
+      ).join('');
+    }
+
+    // ========== UTILS ==========
+    function esc(s) {
+      return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function exportJSON() {
+      const blob = new Blob([JSON.stringify(poisons, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'poisons_hatori.json';
+      a.click();
+      showToast('Export poisons OK');
+    }
+
+    function importJSON() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      input.onchange = e => {
+        const f = e.target.files[0];
+        if (!f) return;
+        const r = new FileReader();
+        r.onload = ev => {
+          try {
+            const data = JSON.parse(ev.target.result);
+            if (!Array.isArray(data)) throw 0;
+            poisons = data;
+            savePoisons();
+            renderPoisons();
+            showToast('Import OK');
+          } catch { showToast('JSON invalide', true); }
+        };
+        r.readAsText(f);
+      };
+      input.click();
+    }
+
+    function exportPlantes() {
+      const blob = new Blob([JSON.stringify(plantes, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'plantes_hatori.json';
+      a.click();
+      showToast('Export plantes OK');
+    }
+
+    function importPlantes() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      input.onchange = e => {
+        const f = e.target.files[0];
+        if (!f) return;
+        const r = new FileReader();
+        r.onload = ev => {
+          try {
+            const data = JSON.parse(ev.target.result);
+            if (!Array.isArray(data)) throw 0;
+            plantes = data;
+            savePlantes();
+            renderPlantes();
+            showToast('Import OK');
+          } catch { showToast('JSON invalide', true); }
+        };
+        r.readAsText(f);
+      };
+      input.click();
+    }
+
+    function showToast(msg, err = false) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.background = err ? 'var(--accent)' : 'var(--success)';
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2000);
+    }
+
+    // Init
+    updateStat('vir'); updateStat('lat'); updateStat('per'); updateStat('vol'); updateStat('ins');
+    updatePlanteStat('vir'); updatePlanteStat('ins');
+    renderPoisons();
+    renderPlantes();
+  </script>
+</body>
+</html>
